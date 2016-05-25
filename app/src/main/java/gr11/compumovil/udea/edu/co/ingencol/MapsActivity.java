@@ -3,6 +3,7 @@ package gr11.compumovil.udea.edu.co.ingencol;
 import android.Manifest;
 import android.app.Notification;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -76,25 +77,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            //mMap.setMyLocationEnabled(true);
             return;
+        } else {
+            //Mostrar error
         }
 
-        mMap.setMyLocationEnabled(true);
+
+        // Add a marker in Medellin and move the camera 6.245052,-75.6311681,12
+        //LatLng medellin = new LatLng(6.245052,-75.6311681);
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //LatLng sydney = new LatLng(-34, 151);
+        //mMap.addMarker(new MarkerOptions().position(medellin).title("Marker in Medellin"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(medellin));
     }
 
     protected void onStart(){
         mGoogleApiClient.connect();
         super.onStart();
-        Action viewAction = Action.newAction(Action.TYPE_VIEW, "Maps Page", Uri.parse(""),Uri.parse(""));
+        Action viewAction = Action.newAction(Action.TYPE_VIEW, "Maps Page", Uri.parse("http://host/path"),
+                Uri.parse("android-app://gr11.compumovil.udea.edu.co.ingencol/http/host/path"));
+        AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
+
+    }
+
+    protected void onStop(){
+        mGoogleApiClient.disconnect();
+        super.onStop();
+        Action viewAction = Action.newAction(Action.TYPE_VIEW, "Maps Page", Uri.parse("http://host/path"),
+                Uri.parse("android-app://gr11.compumovil.udea.edu.co.ingencol/http/host/path"));
+        AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED){
+            return;
+        }
 
+        Location mLastLocation  = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null){
+            //Llevando mi posición actual al mapa
+            LatLng myLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+            //Colocando la camara en mi posicion
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15));
+            mMap.addMarker(new MarkerOptions().position(myLocation).title("Aqui estoy"));
+        }
     }
 
     @Override
