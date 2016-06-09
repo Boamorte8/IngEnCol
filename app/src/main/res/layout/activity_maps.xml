@@ -10,8 +10,16 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="454dp"
          />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="82dp"
+        android:text="New Button"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>
 
 

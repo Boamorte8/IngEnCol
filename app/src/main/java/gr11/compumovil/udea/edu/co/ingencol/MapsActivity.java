@@ -2,13 +2,17 @@ package gr11.compumovil.udea.edu.co.ingencol;
 
 import android.Manifest;
 import android.app.Notification;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -54,6 +58,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addApi(LocationServices.API)
                     .addApi(AppIndex.API).build();
         }
+
+        HelpDB helpdb = new HelpDB(getApplicationContext());
+        SQLiteDatabase db = helpdb.getWritableDatabase();
+        ContentValues valores = new ContentValues();
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_LUGAR_ID, "1");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_NAME, "Santuario de Monserrate");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_DESCRIPTION, "El cerro de Monserrate forma parte del cordón montañoso " +
+                "que bordea el costado oriental de la Sabana de Bogotá, en la cordillera oriental de los Andes. Se encuentra a una " +
+                "altitud de 3200 metros sobre el nivel del mar, y se puede acceder tanto en teleférico como en funicular. También se " +
+                "puede subir a pie, peregrinando mientras se van rezando las estaciones del Viacrucis, representadas con esculturas.");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_IMAGE, "CM.jpg");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_COORDENADA_X, "4.6053536");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_COORDENADA_Y, "-74.0555891,21");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_PERSONAJE, "Pedro Lugo de Albarracín");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_PERS_DESCR, "Fué un importante escultor y toreuta colombiano del siglo XVII," +
+                " que se dedicó a la creación de imágenes devocionales de la Pasión de Cristo, de las cuales la más célebre es la imagen" +
+                " del Cristo Caído, mejor conocida como el Señor de Monserrate en el epónimo santuario del cerro bogotano.");
+        valores.put(LugaresHistoricos.LugarHistorico.COLUMN_PERS_IMAGE, "pedrolugo.jpg");
+
+        // Insert the new row, returning the primary key value of the new row
+        Long lugarId;
+        lugarId = db.insert(LugaresHistoricos.LugarHistorico.TABLE_NAME,null,valores);
+        Toast.makeText(getApplicationContext(), "Se guardó el lugar: " + lugarId, Toast.LENGTH_LONG).show();
     }
 
 
@@ -71,6 +98,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
+
+
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
