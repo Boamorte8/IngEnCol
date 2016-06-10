@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Notification;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
@@ -39,7 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-
+    HelpDB helpdb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addApi(AppIndex.API).build();
         }
 
-        HelpDB helpdb = new HelpDB(getApplicationContext());
+        helpdb = new HelpDB(getApplicationContext());
         SQLiteDatabase db = helpdb.getWritableDatabase();
         ContentValues valores = new ContentValues();
         valores.put(LugaresHistoricos.LugarHistorico.COLUMN_LUGAR_ID, "1");
@@ -99,7 +100,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
 
-
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -112,13 +112,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Mostrar error
         }
 
+        SQLiteDatabase dbr = helpdb.getReadableDatabase();
+        String[] argsel = {"1"};
+        // Define a projection that specifies which columns from the database
+// you will actually use after this query.
+        String[] projection = {
+                LugaresHistoricos.LugarHistorico.COLUMN_NAME,
+                LugaresHistoricos.LugarHistorico.COLUMN_DESCRIPTION,
+                LugaresHistoricos.LugarHistorico.COLUMN_IMAGE,
+                LugaresHistoricos.LugarHistorico.COLUMN_COORDENADA_X,
+                LugaresHistoricos.LugarHistorico.COLUMN_COORDENADA_Y,
+                LugaresHistoricos.LugarHistorico.COLUMN_PERSONAJE,
+                LugaresHistoricos.LugarHistorico.COLUMN_PERS_DESCR,
+                LugaresHistoricos.LugarHistorico.COLUMN_PERS_IMAGE
+
+        };
+
+        Cursor c = dbr.query(
+                LugaresHistoricos.LugarHistorico.TABLE_NAME, projection,                               // The columns to return
+                LugaresHistoricos.LugarHistorico.COLUMN_LUGAR_ID+"=?", argsel, null, null, null
+        );
+
+        c.moveToFirst();
 
         // Add a marker in Medellin and move the camera 6.245052,-75.6311681,12
-        //LatLng medellin = new LatLng(6.245052,-75.6311681);
+        LatLng medellin = new LatLng(6.245052,-75.6311681);
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(medellin).title("Marker in Medellin"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(medellin));
+        mMap.addMarker(new MarkerOptions().position(medellin).title("Marker in Medellin" + c.getString(0)).snippet(c.getString(1)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(medellin));
     }
 
     protected void onStart(){
