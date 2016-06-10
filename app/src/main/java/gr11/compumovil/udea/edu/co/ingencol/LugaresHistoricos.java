@@ -1,5 +1,7 @@
 package gr11.compumovil.udea.edu.co.ingencol;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
@@ -39,9 +41,6 @@ public class LugaresHistoricos {
         public static final String DELETE_TABLA_LUGARES =
                 "DROP TABLE IF EXISTS " + LugarHistorico.TABLE_NAME;
 
-
     }
-
-
 
 }
